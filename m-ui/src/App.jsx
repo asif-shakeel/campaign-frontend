@@ -48,11 +48,9 @@ const clearAllData = async () => {
   const ok = window.confirm(
     "⚠️ This will permanently delete ALL campaigns, recipients, and replies.\n\nThis cannot be undone."
   );
-
   if (!ok) return;
 
   const confirmText = prompt('Type "DELETE_ALL_DATA" to confirm');
-
   if (confirmText !== "DELETE_ALL_DATA") {
     alert("Confirmation failed. Nothing was deleted.");
     return;
@@ -73,10 +71,16 @@ const clearAllData = async () => {
   }
 
   alert("All data cleared.");
+
+  // ✅ Reset UI state
   setCampaigns([]);
   setSelectedId("");
   setRepliesCount(0);
+
+  // ✅ Force reload from backend
+  loadCampaigns();
 };
+
 
   // -------------------------------------------
   // Load campaigns
@@ -403,29 +407,27 @@ const sendCampaign = async file => {
         
       )}
 
-        <button
-          onClick={clearAllData}
-          style={{
-            background: "#dc2626",
-            color: "white",
-            padding: "8px 12px",
-            borderRadius: 6,
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          Clear all data
-        </button>
+<hr style={{ margin: "48px 0" }} />
 
-        alert("All data cleared.");
+<h3 style={{ color: "#b91c1c" }}>Danger zone</h3>
+<p style={{ color: "#7f1d1d", maxWidth: 500 }}>
+  This will permanently delete <strong>all campaigns, recipients, and replies</strong>.
+  Use only for testing or full resets.
+</p>
 
-        // RESET LOCAL STATE
-        setCampaigns([]);
-        setSelectedId("");
-        setRepliesCount(0);
-
-        // FORCE REFRESH FROM SERVER
-        await loadCampaigns();
+<button
+  onClick={clearAllData}
+  style={{
+    background: "#dc2626",
+    color: "white",
+    padding: "10px 14px",
+    borderRadius: 6,
+    border: "none",
+    cursor: "pointer",
+  }}
+>
+  Clear all data
+</button>
 
     </div>
     
