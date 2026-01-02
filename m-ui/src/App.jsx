@@ -344,6 +344,28 @@ const sendCampaign = async file => {
             Download replies CSV
           </button>
 
+          <hr style={{ margin: "40px 0" }} />
+
+          <h3 style={{ color: "#b91c1c" }}>Danger zone</h3>
+          <p style={{ color: "#7f1d1d", maxWidth: 500 }}>
+            This will permanently delete <strong>all campaigns, recipients, and replies</strong>.
+            Use only for testing or full resets.
+          </p>
+
+          <button
+            onClick={clearAllData}
+            style={{
+              background: "#dc2626",
+              color: "white",
+              padding: "8px 12px",
+              borderRadius: 6,
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            Clear all data
+          </button>
+
         </>
       )}
     </div>
