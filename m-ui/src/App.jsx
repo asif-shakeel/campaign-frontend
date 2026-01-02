@@ -44,6 +44,40 @@ export default function App() {
   URL.revokeObjectURL(url);
 };
 
+const clearAllData = async () => {
+  const ok = window.confirm(
+    "⚠️ This will permanently delete ALL campaigns, recipients, and replies.\n\nThis cannot be undone."
+  );
+
+  if (!ok) return;
+
+  const confirmText = prompt('Type "DELETE_ALL_DATA" to confirm');
+
+  if (confirmText !== "DELETE_ALL_DATA") {
+    alert("Confirmation failed. Nothing was deleted.");
+    return;
+  }
+
+  const res = await fetch(`${API_BASE}/admin/clear-all`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-M-Key": M_API_KEY,
+    },
+    body: JSON.stringify({ confirm: "DELETE_ALL_DATA" }),
+  });
+
+  if (!res.ok) {
+    alert("Failed to clear data");
+    return;
+  }
+
+  alert("All data cleared.");
+  setCampaigns([]);
+  setSelectedId("");
+  setRepliesCount(0);
+};
+
   // -------------------------------------------
   // Load campaigns
   // -------------------------------------------
@@ -344,29 +378,31 @@ const sendCampaign = async file => {
             Download replies CSV
           </button>
 
-          <hr style={{ margin: "40px 0" }} />
+        <hr style={{ margin: "40px 0" }} />
 
-          <h3 style={{ color: "#b91c1c" }}>Danger zone</h3>
-          <p style={{ color: "#7f1d1d", maxWidth: 500 }}>
-            This will permanently delete <strong>all campaigns, recipients, and replies</strong>.
-            Use only for testing or full resets.
-          </p>
+        <h3 style={{ color: "#b91c1c" }}>Danger zone</h3>
+        <p style={{ color: "#7f1d1d", maxWidth: 500 }}>
+          This will permanently delete <strong>all campaigns, recipients, and replies</strong>.
+          Use only for testing or full resets.
+        </p>
 
-          <button
-            onClick={clearAllData}
-            style={{
-              background: "#dc2626",
-              color: "white",
-              padding: "8px 12px",
-              borderRadius: 6,
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            Clear all data
-          </button>
+        <button
+          onClick={clearAllData}
+          style={{
+            background: "#dc2626",
+            color: "white",
+            padding: "8px 12px",
+            borderRadius: 6,
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          Clear all data
+        </button>
+
 
         </>
+        
       )}
     </div>
   );
