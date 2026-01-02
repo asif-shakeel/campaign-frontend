@@ -110,6 +110,10 @@ const loadCampaigns = async () => {
   }
 };
 
+useEffect(() => {
+  loadCampaigns();
+}, []);
+
   // -------------------------------------------
   // Load replies count for selected campaign
   // -------------------------------------------
