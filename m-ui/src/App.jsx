@@ -398,6 +398,11 @@ const sendCampaign = async file => {
           Use only for testing or full resets.
         </p>
 
+
+        </>
+        
+      )}
+
         <button
           onClick={clearAllData}
           style={{
@@ -422,10 +427,7 @@ const sendCampaign = async file => {
         // FORCE REFRESH FROM SERVER
         await loadCampaigns();
 
-
-        </>
-        
-      )}
     </div>
+    
   );
 }

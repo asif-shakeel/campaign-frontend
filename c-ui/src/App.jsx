@@ -333,15 +333,16 @@ const resetState = () => {
                 Download replies CSV
               </button>
             )}
-            <button onClick={async () => {
+
+
+          </>
+        )}
+                    <button onClick={async () => {
               resetState();
               await loadCampaigns();
             }}>
               Refresh campaigns
             </button>
-
-          </>
-        )}
       </div>
     </div>
   );
