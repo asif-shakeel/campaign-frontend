@@ -70,15 +70,10 @@ const clearAllData = async () => {
     return;
   }
 
+
   alert("All data cleared.");
+  await loadCampaigns();
 
-  // ✅ Reset UI state
-  setCampaigns([]);
-  setSelectedId("");
-  setRepliesCount(0);
-
-  // ✅ Force reload from backend
-  loadCampaigns();
 };
 
 
@@ -86,39 +81,34 @@ const clearAllData = async () => {
   // Load campaigns
   // -------------------------------------------
 
-  const loadCampaigns = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/campaigns`, {
-        headers: { "X-M-Key": M_API_KEY },
-      });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
+const loadCampaigns = async () => {
+  try {
+    const res = await fetch(`${API_BASE}/campaigns`, {
+      headers: { "X-M-Key": M_API_KEY },
+    });
+    if (!res.ok) throw new Error();
 
-    // ✅ HARD RESET UI if backend is empty
+    const data = await res.json();
+
+    // ✅ HARD RESET if backend is empty
     if (!data.length) {
       setCampaigns([]);
       setSelectedId("");
-      setSubject("");
-      setBody("");
-      setReplies([]);
-      setLoading(false);
+      setRepliesCount(0);
+      setStatus("ready");
       return;
     }
 
-      setCampaigns(
-        data.sort(
-          (a, b) => new Date(b.created_at) - new Date(a.created_at)
-        )
-      );
-      setStatus("ready");
-    } catch {
-      setStatus("error");
-    }
-  };
-
-  useEffect(() => {
-    loadCampaigns();
-  }, []);
+    setCampaigns(
+      data.sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at)
+      )
+    );
+    setStatus("ready");
+  } catch {
+    setStatus("error");
+  }
+};
 
   // -------------------------------------------
   // Load replies count for selected campaign
