@@ -23,7 +23,7 @@ export default function App() {
   // --------------------------------------------------
 
 const loadCampaigns = async () => {
-  setLoading(true);        // ✅ important
+  setLoading(true);
 
   try {
     const res = await fetch(`${API_BASE}/campaigns`, {
@@ -55,6 +55,11 @@ const loadCampaigns = async () => {
     setLoading(false);
   }
 };
+
+// ✅ ADD THIS
+useEffect(() => {
+  loadCampaigns();
+}, []);
 
 
   // --------------------------------------------------
