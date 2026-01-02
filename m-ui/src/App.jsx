@@ -118,19 +118,26 @@ useEffect(() => {
   // Load replies count for selected campaign
   // -------------------------------------------
 
-  useEffect(() => {
-    if (!selectedId) {
-      setRepliesCount(0);
-      return;
-    }
+useEffect(() => {
+  if (!selectedId) {
+    setRepliesCount(0);
+    return;
+  }
 
+  const load = () => {
     fetch(`${API_BASE}/replies?campaign_id=${selectedId}`, {
       headers: { "X-M-Key": M_API_KEY },
     })
       .then(res => res.json())
       .then(data => setRepliesCount(data.length))
       .catch(() => setRepliesCount(0));
-  }, [selectedId]);
+  };
+
+  load(); // initial
+  const id = setInterval(load, 5000); // poll every 5s
+  return () => clearInterval(id);
+}, [selectedId]);
+
 
   // -------------------------------------------
   // Create campaign
