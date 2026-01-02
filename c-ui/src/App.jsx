@@ -23,6 +23,8 @@ export default function App() {
   // --------------------------------------------------
 
 const loadCampaigns = async () => {
+  setLoading(true);        // ✅ important
+
   try {
     const res = await fetch(`${API_BASE}/campaigns`, {
       headers: { "X-C-Key": C_API_KEY },
@@ -31,7 +33,6 @@ const loadCampaigns = async () => {
 
     const data = await res.json();
 
-    // ✅ HARD RESET UI if backend is empty
     if (!data.length) {
       setCampaigns([]);
       setSelectedId("");
@@ -55,10 +56,6 @@ const loadCampaigns = async () => {
   }
 };
 
-
-  useEffect(() => {
-    loadCampaigns();
-  }, []);
 
   // --------------------------------------------------
   // Load campaign content + replies
@@ -200,13 +197,7 @@ const downloadRepliesCSV = async () => {
   URL.revokeObjectURL(url);
 };
 
-const resetState = () => {
-  setCampaigns([]);
-  setSelectedId("");
-  setSubject("");
-  setBody("");
-  setReplies([]);
-};
+
 
   // --------------------------------------------------
   // Render
@@ -337,12 +328,10 @@ const resetState = () => {
 
           </>
         )}
-                    <button onClick={async () => {
-              resetState();
-              await loadCampaigns();
-            }}>
-              Refresh campaigns
-            </button>
+<button onClick={loadCampaigns}>
+  Refresh campaigns
+</button>
+
       </div>
     </div>
   );
