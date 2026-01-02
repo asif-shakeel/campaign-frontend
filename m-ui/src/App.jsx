@@ -82,6 +82,7 @@ const clearAllData = async () => {
   // -------------------------------------------
 
 const loadCampaigns = async () => {
+  setRepliesCount(0); // 👈 ADD THIS LINE
   try {
     const res = await fetch(`${API_BASE}/campaigns`, {
       headers: { "X-M-Key": M_API_KEY },
@@ -138,6 +139,16 @@ useEffect(() => {
   return () => clearInterval(id);
 }, [selectedId]);
 
+useEffect(() => {
+  if (!selectedId) return;
+
+  fetch(`${API_BASE}/replies?campaign_id=${selectedId}`, {
+    headers: { "X-M-Key": M_API_KEY },
+  })
+    .then(res => res.json())
+    .then(data => setRepliesCount(data.length))
+    .catch(() => {});
+}, [campaigns]);
 
   // -------------------------------------------
   // Create campaign
