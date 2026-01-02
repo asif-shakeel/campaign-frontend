@@ -197,14 +197,73 @@ useEffect(() => {
   // Upload CSV & send campaign
   // -------------------------------------------
 
-const sendCampaign = async file => {
+// const sendCampaign = async file => {
+//   if (!file || !selectedId) return;
+
+//   setBusy(true);
+//   setError("");
+
+//   try {
+//     // 1. Read CSV in browser
+//     const text = await file.text();
+//     const emails = text
+//       .split(/\r?\n/)
+//       .map(l => l.trim())
+//       .filter(l => l && l.includes("@"));
+
+//     if (!emails.length) {
+//       throw new Error("No valid emails found in CSV");
+//     }
+
+//     // 2. Upload emails
+//     const upload = await fetch(
+//       `${API_BASE}/campaigns/${selectedId}/upload-emails`,
+//       {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//           "X-M-Key": M_API_KEY,
+//         },
+//         body: JSON.stringify({ emails }),
+//       }
+//     );
+
+//     if (!upload.ok) {
+//       throw new Error("Failed to upload emails");
+//     }
+
+//     // 3. Send campaign
+//     const send = await fetch(
+//       `${API_BASE}/campaigns/${selectedId}/send`,
+//       {
+//         method: "POST",
+//         headers: { "X-M-Key": M_API_KEY },
+//       }
+//     );
+
+//     const result = await send.json();
+
+//     if (!send.ok) {
+//       throw new Error(result.error || "Send failed");
+//     }
+
+//     alert(`Sent: ${result.sent}\nFailed: ${result.failed}`);
+//     loadCampaigns();
+
+//   } catch (e) {
+//     setError(e.message || "Send failed");
+//   } finally {
+//     setBusy(false);
+//   }
+// };
+
+const uploadRecipients = async file => {
   if (!file || !selectedId) return;
 
   setBusy(true);
   setError("");
 
   try {
-    // 1. Read CSV in browser
     const text = await file.text();
     const emails = text
       .split(/\r?\n/)
@@ -212,11 +271,10 @@ const sendCampaign = async file => {
       .filter(l => l && l.includes("@"));
 
     if (!emails.length) {
-      throw new Error("No valid emails found in CSV");
+      throw new Error("No valid emails found");
     }
 
-    // 2. Upload emails
-    const upload = await fetch(
+    const res = await fetch(
       `${API_BASE}/campaigns/${selectedId}/upload-emails`,
       {
         method: "POST",
@@ -228,12 +286,25 @@ const sendCampaign = async file => {
       }
     );
 
-    if (!upload.ok) {
-      throw new Error("Failed to upload emails");
-    }
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error);
 
-    // 3. Send campaign
-    const send = await fetch(
+    alert(`Uploaded ${result.uploaded} recipients`);
+  } catch (e) {
+    setError(e.message);
+  } finally {
+    setBusy(false);
+  }
+};
+
+const sendCampaignNow = async () => {
+  if (!selectedId) return;
+
+  setBusy(true);
+  setError("");
+
+  try {
+    const res = await fetch(
       `${API_BASE}/campaigns/${selectedId}/send`,
       {
         method: "POST",
@@ -241,22 +312,17 @@ const sendCampaign = async file => {
       }
     );
 
-    const result = await send.json();
-
-    if (!send.ok) {
-      throw new Error(result.error || "Send failed");
-    }
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error);
 
     alert(`Sent: ${result.sent}\nFailed: ${result.failed}`);
     loadCampaigns();
-
   } catch (e) {
-    setError(e.message || "Send failed");
+    setError(e.message);
   } finally {
     setBusy(false);
   }
 };
-
 
   // -------------------------------------------
   // Downloads
@@ -361,15 +427,23 @@ const sendCampaign = async file => {
           <input
             type="file"
             accept=".csv"
-            disabled={busy || selected.status !== "ready"}
-            onChange={e => sendCampaign(e.target.files[0])}
+            disabled={busy}
+            onChange={e => uploadRecipients(e.target.files[0])}
           />
+
           <p style={{ color: "#777", fontSize: 14 }}>
             CSV should contain one email address per line.
           </p>
 
           <hr />
+<button
+  onClick={sendCampaignNow}
+  disabled={busy || selected.status !== "ready"}
+>
+  Send campaign
+</button>
 
+          <hr />
           {/* Downloads */}
          <h3>Downloads</h3>
         <p style={{ color: "#666", marginTop: -8 }}>
