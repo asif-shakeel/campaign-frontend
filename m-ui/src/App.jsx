@@ -463,12 +463,12 @@ const sendCampaignNow = async () => {
           </button>
 
         <hr style={{ margin: "40px 0" }} />
-
+{/* 
         <h3 style={{ color: "#b91c1c" }}>Danger zone</h3>
         <p style={{ color: "#7f1d1d", maxWidth: 500 }}>
           This will permanently delete <strong>all campaigns, recipients, and replies</strong>.
           Use only for testing or full resets.
-        </p>
+        </p> */}
 
 
         </>
