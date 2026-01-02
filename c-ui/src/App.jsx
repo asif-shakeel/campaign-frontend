@@ -22,24 +22,39 @@ export default function App() {
   // Load campaigns
   // --------------------------------------------------
 
-  const loadCampaigns = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/campaigns`, {
-        headers: { "X-C-Key": C_API_KEY },
-      });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      setCampaigns(
-        data.sort(
-          (a, b) => new Date(b.created_at) - new Date(a.created_at)
-        )
-      );
+const loadCampaigns = async () => {
+  try {
+    const res = await fetch(`${API_BASE}/campaigns`, {
+      headers: { "X-C-Key": C_API_KEY },
+    });
+    if (!res.ok) throw new Error();
+
+    const data = await res.json();
+
+    // ✅ HARD RESET UI if backend is empty
+    if (!data.length) {
+      setCampaigns([]);
+      setSelectedId("");
+      setSubject("");
+      setBody("");
+      setReplies([]);
       setLoading(false);
-    } catch {
-      setError("Failed to load campaigns");
-      setLoading(false);
+      return;
     }
-  };
+
+    setCampaigns(
+      data.sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at)
+      )
+    );
+
+    setLoading(false);
+  } catch {
+    setError("Failed to load campaigns");
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     loadCampaigns();
@@ -185,6 +200,14 @@ const downloadRepliesCSV = async () => {
   URL.revokeObjectURL(url);
 };
 
+const resetState = () => {
+  setCampaigns([]);
+  setSelectedId("");
+  setSubject("");
+  setBody("");
+  setReplies([]);
+};
+
   // --------------------------------------------------
   // Render
   // --------------------------------------------------
@@ -310,6 +333,13 @@ const downloadRepliesCSV = async () => {
                 Download replies CSV
               </button>
             )}
+            <button onClick={async () => {
+              resetState();
+              await loadCampaigns();
+            }}>
+              Refresh campaigns
+            </button>
+
           </>
         )}
       </div>

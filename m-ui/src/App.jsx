@@ -89,6 +89,18 @@ const clearAllData = async () => {
       });
       if (!res.ok) throw new Error();
       const data = await res.json();
+
+    // ✅ HARD RESET UI if backend is empty
+    if (!data.length) {
+      setCampaigns([]);
+      setSelectedId("");
+      setSubject("");
+      setBody("");
+      setReplies([]);
+      setLoading(false);
+      return;
+    }
+
       setCampaigns(
         data.sort(
           (a, b) => new Date(b.created_at) - new Date(a.created_at)
@@ -399,6 +411,16 @@ const sendCampaign = async file => {
         >
           Clear all data
         </button>
+
+        alert("All data cleared.");
+
+        // RESET LOCAL STATE
+        setCampaigns([]);
+        setSelectedId("");
+        setRepliesCount(0);
+
+        // FORCE REFRESH FROM SERVER
+        await loadCampaigns();
 
 
         </>
