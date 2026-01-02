@@ -153,44 +153,66 @@ export default function App() {
   // Upload CSV & send campaign
   // -------------------------------------------
 
-  const sendCampaign = async file => {
-    if (!file || !selectedId) return;
+const sendCampaign = async file => {
+  if (!file || !selectedId) return;
 
-    setBusy(true);
-    setError("");
+  setBusy(true);
+  setError("");
 
-    const form = new FormData();
-    form.append("file", file);
+  try {
+    // 1. Read CSV in browser
+    const text = await file.text();
+    const emails = text
+      .split(/\r?\n/)
+      .map(l => l.trim())
+      .filter(l => l && l.includes("@"));
 
-    try {
-      const res = await fetch(
-        `${API_BASE}/campaigns/${selectedId}/upload-and-send`,
-        {
-          method: "POST",
-          headers: {
-            "X-M-Key": M_API_KEY,
-          },
-          body: form,
-        }
-      );
-
-      const payload = await res.json();
-
-      if (!res.ok) {
-        throw new Error(payload.error || "Send failed");
-      }
-
-      alert(
-        `Sent: ${payload.sent}\nFailed: ${payload.failed}`
-      );
-
-      loadCampaigns();
-    } catch (e) {
-      setError(e.message || "Send failed");
-    } finally {
-      setBusy(false);
+    if (!emails.length) {
+      throw new Error("No valid emails found in CSV");
     }
-  };
+
+    // 2. Upload emails
+    const upload = await fetch(
+      `${API_BASE}/campaigns/${selectedId}/upload-emails`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-M-Key": M_API_KEY,
+        },
+        body: JSON.stringify({ emails }),
+      }
+    );
+
+    if (!upload.ok) {
+      throw new Error("Failed to upload emails");
+    }
+
+    // 3. Send campaign
+    const send = await fetch(
+      `${API_BASE}/campaigns/${selectedId}/send`,
+      {
+        method: "POST",
+        headers: { "X-M-Key": M_API_KEY },
+      }
+    );
+
+    const result = await send.json();
+
+    if (!send.ok) {
+      throw new Error(result.error || "Send failed");
+    }
+
+    alert(`Sent: ${result.sent}\nFailed: ${result.failed}`);
+    loadCampaigns();
+
+  } catch (e) {
+    setError(e.message || "Send failed");
+  } finally {
+    setBusy(false);
+  }
+};
+
 
   // -------------------------------------------
   // Downloads
