@@ -307,7 +307,12 @@ const uploadRecipients = async file => {
     const result = await res.json();
     if (!res.ok) throw new Error(result.error);
 
-    alert(`Uploaded ${result.uploaded} recipients`);
+  alert(
+    `Submitted: ${result.submitted}\n` +
+    `Valid: ${result.valid}\n` +
+    `Invalid: ${result.invalid}`
+  );
+
   } catch (e) {
     setError(e.message);
   } finally {
